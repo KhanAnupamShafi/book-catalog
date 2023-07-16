@@ -19,12 +19,8 @@ const Navbar = () => {
 				</Link>
 
 				<ul className="hidden md:flex items-center space-x-6">
-					<Link
-						to="/"
-						className="font-semibold cursor-pointer"
-						id="lws-bookStore"
-					>
-						<li>Book Store</li>
+					<Link to="/all-books" className="font-semibold cursor-pointer">
+						<li>All Books</li>
 					</Link>
 					<Link to="books/add" className="cursor-pointer" id="lws-addBook">
 						<li>Add Book</li>
