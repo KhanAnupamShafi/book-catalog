@@ -26,6 +26,8 @@ export const registerUser = createAsyncThunk(
 			password
 		);
 
+		console.log('hello', userCredential);
+
 		return userCredential.user.email;
 	}
 );

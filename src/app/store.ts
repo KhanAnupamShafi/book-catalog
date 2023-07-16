@@ -4,8 +4,8 @@ import userReducer from '../rtk/features/user/userSlice';
 
 const store = configureStore({
 	reducer: {
-		// [apiSlice.reducerPath]: apiSlice.reducer,
-		// user: userReducer,
+		[apiSlice.reducerPath]: apiSlice.reducer,
+		user: userReducer,
 	},
 	middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(),
 });
