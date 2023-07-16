@@ -1,6 +1,9 @@
 import { auth } from '@/lib/firebase';
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import {
+	createUserWithEmailAndPassword,
+	signInWithEmailAndPassword,
+} from 'firebase/auth';
 
 const initialState = {
 	user: {
@@ -18,7 +21,7 @@ interface IUserCredential {
 
 // create async thunk
 export const registerUser = createAsyncThunk(
-	'user',
+	'user/registerUser',
 	async ({ email, password }: IUserCredential) => {
 		const userCredential = await createUserWithEmailAndPassword(
 			auth,
@@ -26,7 +29,18 @@ export const registerUser = createAsyncThunk(
 			password
 		);
 
-		console.log('hello', userCredential);
+		return userCredential.user.email;
+	}
+);
+// create async thunk
+export const loginUser = createAsyncThunk(
+	'user/loginUser',
+	async ({ email, password }: IUserCredential) => {
+		const userCredential = await signInWithEmailAndPassword(
+			auth,
+			email,
+			password
+		);
 
 		return userCredential.user.email;
 	}
@@ -38,6 +52,9 @@ const userSlice = createSlice({
 	reducers: {
 		setUser: (state, action: PayloadAction<string | null>) => {
 			state.user.email = action.payload;
+		},
+		setLoading: (state, action: PayloadAction<boolean>) => {
+			state.isLoading = action.payload;
 		},
 	},
 	extraReducers: (builder) => {
@@ -55,10 +72,24 @@ const userSlice = createSlice({
 				state.isLoading = false;
 				state.isError = true;
 				state.error = action.error.message || null;
+			})
+			.addCase(loginUser.pending, (state, action) => {
+				state.isLoading = true;
+				state.isError = false;
+				state.error = null;
+			})
+			.addCase(loginUser.fulfilled, (state, action) => {
+				state.isLoading = false;
+				state.user.email = action.payload;
+			})
+			.addCase(loginUser.rejected, (state, action) => {
+				state.isLoading = false;
+				state.isError = true;
+				state.error = action.error.message || null;
 			});
 	},
 });
 
-export const { setUser } = userSlice.actions;
+export const { setUser, setLoading } = userSlice.actions;
 
 export default userSlice.reducer;

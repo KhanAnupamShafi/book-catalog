@@ -1,13 +1,26 @@
+import { useAppDispatch, useAppSelector } from '@/app/hook';
+import { toastAlert } from '@/helpers/AppHelper';
+import { loginUser } from '@/rtk/features/user/userSlice';
+import { size } from 'lodash';
 import { useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Id, ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Logo from '../assets/logo.svg';
+interface IMutationData {
+	email: string;
+	password: string;
+}
 
 const Login = () => {
+	const { isLoading } = useAppSelector((state) => state.user);
+
 	const { pathname } = useLocation();
-	//   const [login, { isLoading }] = useLoginMutation();
-	const [mutationData, setMutationData] = useState({});
-	const dispatch = useDispatch();
+	const [mutationData, setMutationData] = useState<IMutationData>({
+		email: '',
+		password: '',
+	});
+	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const toastId = useRef(null);
 
@@ -16,41 +29,41 @@ const Login = () => {
 	};
 
 	console.log(mutationData);
-	const handleSubmit = (e) => {
+	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		//  toast.dismiss(toastId.current);
+		toast.dismiss(toastId.current!);
+		const updatedData = {
+			email: mutationData.email,
+			password: mutationData.password,
+		};
 
-		//  if (size(mutationData)) {
-		//    login(mutationData)
-		//      .unwrap()
-		//      .then((payload) => {
-		//        const { accessToken, user } = payload || {};
-		//        const result = {
-		//          accessToken,
-		//          user,
-		//        };
+		if (size(updatedData)) {
+			dispatch(loginUser(updatedData))
+				.unwrap()
+				.then((payload) => {
+					console.log(payload, 'updated');
+				})
+				.catch((err) => {
+					toastAlert('error', err?.message || err?.error);
+				});
+		}
+		//     if (pathname === "/" && user?.role !== "student") {
+		//       toastAlert("warning", "You're not a student!");
+		//     } else if (pathname === "/admin" && user?.role !== "admin") {
+		//       toastAlert("warning", "You're not a admin!");
+		//     } else {
+		//       if (size(result)) {
+		//         localStorage.setItem("auth", JSON.stringify(result));
+		//         dispatch(userLoggedIn(result));
+		//       }
 
-		//        if (pathname === "/" && user?.role !== "student") {
-		//          toastAlert("warning", "You're not a student!");
-		//        } else if (pathname === "/admin" && user?.role !== "admin") {
-		//          toastAlert("warning", "You're not a admin!");
-		//        } else {
-		//          if (size(result)) {
-		//            localStorage.setItem("auth", JSON.stringify(result));
-		//            dispatch(userLoggedIn(result));
-		//          }
-
-		//          if (user?.role === "admin") {
-		//            navigate("/admin/dashboard");
-		//          } else if (user?.role === "student") {
-		//            navigate("/course-player");
-		//          }
-		//        }
-		//      })
-		//      .catch((err) => {
-		//        toastAlert("error", err?.data || err?.error);
-		//      });
-		//  }
+		//       if (user?.role === "admin") {
+		//         navigate("/admin/dashboard");
+		//       } else if (user?.role === "student") {
+		//         navigate("/course-player");
+		//       }
+		//     }
+		//   })
 	};
 
 	return (
@@ -111,10 +124,10 @@ const Login = () => {
 					<div>
 						<button
 							type="submit"
-							//   disabled={isLoading}
+							disabled={isLoading}
 							className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
 						>
-							{/* {isLoading ? 'Authenticating...' : 'Sign in'} */}
+							{isLoading ? 'Authenticating...' : 'Sign in'}
 						</button>
 					</div>
 
@@ -129,6 +142,7 @@ const Login = () => {
 					</p>
 				</form>
 			</div>
+			<ToastContainer />
 		</section>
 	);
 };
