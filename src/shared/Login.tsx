@@ -2,20 +2,21 @@ import { useAppDispatch, useAppSelector } from '@/app/hook';
 import { toastAlert } from '@/helpers/AppHelper';
 import { loginUser } from '@/rtk/features/user/userSlice';
 import { size } from 'lodash';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Id, ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Logo from '../assets/logo.svg';
+import { LoadingSpinnerAuth } from './LoadingSpinner';
 interface IMutationData {
 	email: string;
 	password: string;
 }
 
 const Login = () => {
-	const { isLoading } = useAppSelector((state) => state.user);
+	const { isLoading, user } = useAppSelector((state) => state.user);
 
-	const { pathname } = useLocation();
+	const { pathname, state: locationState } = useLocation();
 	const [mutationData, setMutationData] = useState<IMutationData>({
 		email: '',
 		password: '',
@@ -28,7 +29,16 @@ const Login = () => {
 		setMutationData((prevData) => ({ ...prevData, [type]: value }));
 	};
 
-	console.log(mutationData);
+	useEffect(() => {
+		if (!isLoading && user.email) {
+			if (locationState?.from) {
+				navigate(locationState.from);
+			} else {
+				navigate('/');
+			}
+		}
+	}, [isLoading, user, locationState, navigate]);
+
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		toast.dismiss(toastId.current!);
@@ -47,23 +57,6 @@ const Login = () => {
 					toastAlert('error', err?.message || err?.error);
 				});
 		}
-		//     if (pathname === "/" && user?.role !== "student") {
-		//       toastAlert("warning", "You're not a student!");
-		//     } else if (pathname === "/admin" && user?.role !== "admin") {
-		//       toastAlert("warning", "You're not a admin!");
-		//     } else {
-		//       if (size(result)) {
-		//         localStorage.setItem("auth", JSON.stringify(result));
-		//         dispatch(userLoggedIn(result));
-		//       }
-
-		//       if (user?.role === "admin") {
-		//         navigate("/admin/dashboard");
-		//       } else if (user?.role === "student") {
-		//         navigate("/course-player");
-		//       }
-		//     }
-		//   })
 	};
 
 	return (
@@ -121,6 +114,7 @@ const Login = () => {
 							</Link>
 						</div>
 					</div>
+					{isLoading && <LoadingSpinnerAuth />}
 					<div>
 						<button
 							type="submit"

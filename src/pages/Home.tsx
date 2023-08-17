@@ -1,30 +1,50 @@
+import BookCard from '@/components/BookCard';
+import Landing from '@/components/Landing';
+import NewsLetter from '@/components/NewsLetter';
+import Skeleton from '@/components/Skeleton';
+import { useGetLatestBooksQuery } from '@/rtk/features/book/bookApi';
+import { IBook } from '@/types/globalTypes';
+import { ScaleLoader } from 'react-spinners';
+
 export default function Home() {
+	const { data: books, isLoading, isError } = useGetLatestBooksQuery(undefined);
+	const renderSkeletons = () => {
+		const numSkeletons = 2; // Number of Skeleton components to render
+		const skeletons = [];
+
+		for (let i = 0; i < numSkeletons; i++) {
+			skeletons.push(<ScaleLoader color="#36d7b7" key={`skeleton-${i}`} />);
+		}
+
+		return skeletons;
+	};
 	return (
 		<>
-			<div className="flex justify-between items-center h-[calc(100vh-80px)] max-w-7xl mx-auto ">
-				<div>
-					<h1 className="text-6xl font-black text-primary mb-2">
-						HAYLOU <br /> SOLAR PLUSE
+			{' '}
+			<div className="w-full">
+				<Landing />
+			</div>
+			<div className="w-full text-center mb-">
+				<div>{/* <img className="mx-auto" src={hero} alt="" /> */}</div>
+				<div className="max-w-[1480px] mx-auto flex flex-col items-center justify-center">
+					<h1 className="text-xl font-black text-primary text-start mr-auto uppercase border-b pb-2 mt-10">
+						Latest collection
 					</h1>
-					<p className="text-secondary font-semibold text-xl">
-						Effortless communication at your fingertips
-					</p>
-					<div className="text-primary mt-20">
-						<p>Bluetooth 5.2 for easy, secure communication</p>
-						<p>Precise 143 Amoled display for clear visuals</p>
+					<div className="h-[1px] w-full bg-slate-300 mb-4"></div>
+
+					<div className="space-y-6 md:space-y-0 md:grid grid-cols-1 lg:grid-cols-3 gap-6">
+						{isLoading ? (
+							renderSkeletons()
+						) : isError ? (
+							<div>Error fetching data</div>
+						) : (
+							books?.data?.map((book: Partial<IBook>) => (
+								<BookCard key={book?._id} book={book} />
+							))
+						)}
 					</div>
 				</div>
-				<div className="relative -right-14">
-					{/* <img src={banner} alt="" /> */}
-				</div>
-			</div>
-			<div className="mb-96">
-				<div>{/* <img className="mx-auto" src={hero} alt="" /> */}</div>
-				<div className="flex flex-col items-center justify-center">
-					<h1 className="text-5xl font-black text-primary uppercase mt-10">
-						The future of tech is here
-					</h1>
-				</div>
+				<NewsLetter />
 			</div>
 		</>
 	);

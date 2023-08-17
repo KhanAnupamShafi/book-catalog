@@ -1,10 +1,10 @@
-import Form from 'components/EditBook/Form';
-import LoadingSpinner from 'components/shared/LoadingSpinner';
-import warningMessage from 'components/utils/warningMessage';
-import { useGetBookQuery } from 'features/api/bookApi';
+import { warningMessage } from '@/helpers/Warning';
+import { useGetABookQuery } from '@/rtk/features/book/bookApi';
+import LoadingSpinner from '@/shared/LoadingSpinner';
 import { size } from 'lodash';
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import Form from './Form';
 
 const EditBook = () => {
 	const { id } = useParams();
@@ -12,7 +12,7 @@ const EditBook = () => {
 		data: BookInfo,
 		isLoading: isBookLoading,
 		isError,
-	} = useGetBookQuery(id);
+	} = useGetABookQuery({ id });
 
 	return (
 		<>

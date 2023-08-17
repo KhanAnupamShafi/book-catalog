@@ -9,7 +9,8 @@ const store = configureStore({
 		user: userReducer,
 		booksFilter: bookReducer,
 	},
-	middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(),
+	middleware: (getDefaultMiddleware) =>
+		getDefaultMiddleware().concat(apiSlice.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
